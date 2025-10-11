@@ -1,4 +1,6 @@
+"use client";
 import { Heart, Calendar, Tag, Sparkles } from "lucide-react";
+import React, { useState } from 'react';
 
 // --- 1. Define the TypeScript Interface for Art Data ---
 interface ArtPiece {
@@ -116,15 +118,28 @@ interface ArtCardProps {
   art: ArtPiece;
 }
 
-// --- Art Card Component (Now correctly typed) ---
-// Note: Line 50 is now the start of this functional component definition.
+// --- Art Card Component (Now correctly typed and with touch events) ---
 const ArtCard = ({ art }: ArtCardProps) => {
+  const [isTouched, setIsTouched] = useState(false);
+
   // Determine text color based on status
   const statusColor = art.status === "Sold" ? "text-red-500" : "text-green-500";
   const statusBg = art.status === "Sold" ? "bg-red-100" : "bg-green-100";
 
+  // Handler for touch events (mobile friendly overlay display)
+  const handleTouch = (active: boolean) => {
+    setIsTouched(active);
+  };
+
+  // Class to control overlay visibility based on hover (desktop) or touch (mobile)
+  const overlayClass = `opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${isTouched ? '!opacity-100' : ''}`;
+
   return (
-    <div className="relative overflow-hidden rounded-xl shadow-lg group transform transition-transform duration-300 hover:scale-[1.02]">
+    <div 
+      className="relative overflow-hidden rounded-xl shadow-lg group transform transition-transform duration-300 hover:scale-[1.02] cursor-pointer"
+      onTouchStart={() => handleTouch(true)} // Touch start shows overlay
+      onTouchEnd={() => setTimeout(() => handleTouch(false), 2000)} // Touch end hides after a pause
+    >
       {/* Art Image Container: w-full and aspect-square ensures fluid size */}
       <div className="w-full aspect-square overflow-hidden bg-gray-100">
         <img 
@@ -134,11 +149,16 @@ const ArtCard = ({ art }: ArtCardProps) => {
           height="600"
           className="object-cover w-full h-full transition-opacity duration-500 group-hover:opacity-30" 
           loading="lazy" 
+          // Fallback in case local images are not found
+          onError={(e) => {
+             e.currentTarget.onerror = null; 
+             e.currentTarget.src = `https://placehold.co/600x600/C4A7F8/ffffff?text=Image+${art.id}`; 
+          }}
         />
       </div>
 
-      {/* Overlay Content on Hover */}
-      <div className="absolute inset-0 flex flex-col justify-center items-center p-4 sm:p-6 bg-pink-300/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+      {/* Overlay Content on Hover/Touch */}
+      <div className={`absolute inset-0 flex flex-col justify-center items-center p-4 sm:p-6 bg-pink-300/90 backdrop-blur-sm ${overlayClass}`}>
         {/* Adjusted title size for responsiveness on smaller screens */}
         <h3 className="text-lg sm:text-xl font-bold text-white mb-4 text-center">{art.name}</h3>
         
@@ -170,25 +190,25 @@ const ArtCard = ({ art }: ArtCardProps) => {
 
 export default function Home() {
   return (
-    
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-100 to-yellow-50 font-inter p-4 sm:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-100 to-yellow-50 p-4 sm:p-8">
         
-        {/* --- 1. Hero Section: Evelyn's Art Space --- */}
-        <header className="py-16 text-center">
-          {/* Sparkle Icon */}
-          <Sparkles className="w-12 h-12 mx-auto text-purple-600 mb-4 animate-pulse" />
-          
-          {/* Image Title: Centered and Responsive */}
-          {/* text-center on parent centers the Sparkles and the image (when treated as block) */}
-          <img 
-            src="heroWeb.png" 
-            className="w-full max-w-lg mx-auto block mb-4" 
-            alt="Evelyn's Art Space Title Image" 
-          />
-          
-      
-        </header>
-      
+      {/* --- 1. Hero Section: Evelyn's Art Space --- */}
+      <header className="py-16 text-center">
+        {/* Sparkle Icon */}
+        <Sparkles className="w-12 h-12 mx-auto text-purple-600 mb-4 animate-pulse" />
+        
+        {/* Image Title: Centered and Responsive */}
+        <img 
+          src="heroWeb.png" 
+          className="w-full max-w-lg mx-auto block mb-4" 
+          alt="Evelyn's Art Space Title Image" 
+        />
+        
+        <p className="text-xl text-purple-800 italic">
+          A collection of dreams in pastel and pigment.
+        </p>
+      </header>
+    
       {/* --- 2. Gallery Section --- */}
       <main className="max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-gray-700 mb-8 border-b-2 border-pink-300 pb-2">
@@ -209,6 +229,5 @@ export default function Home() {
       </footer>
 
     </div>
-  
   );
 }
