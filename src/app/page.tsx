@@ -116,21 +116,21 @@ const mockArt: ArtPiece[] = [
     name: "Panda Chibi (Custom)", 
     date: "14-10-25", 
     status: "Sold", 
-    imageUrl: "15.jpg" 
+    imageUrl: "15.png" 
   },
   { 
     id: 16, 
     name: "Drew the Dog Chibi (Custom)", 
     date: "12-10-25", 
     status: "Sold", 
-    imageUrl: "16.jpg" 
+    imageUrl: "16.png" 
   },
   { 
     id: 17, 
     name: "Charmander Pokemon Adopt Halloween Batch (Premade)", 
     date: "5-10-25", 
     status: "Available", 
-    imageUrl: "17.jpg" 
+    imageUrl: "17.png" 
   },
 ];
 
